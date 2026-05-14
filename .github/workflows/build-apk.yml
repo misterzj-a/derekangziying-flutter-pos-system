@@ -1,7 +1,8 @@
-name: 构建APK
+name: Build Flutter APK
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
@@ -9,29 +10,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🔥 修复关键：自动创建空的 key.properties，解决报错！
-      - name: 创建签名配置文件
+      # 👇 👇 👇 关键：生成一个合法的最小 google-services.json（不是空json！）
+      - name: Generate valid google-services.json
         run: |
-          mkdir -p android
-          echo "storePassword=test" > android/key.properties
-          echo "keyPassword=test" >> android/key.properties
-          echo "keyAlias=test" >> android/key.properties
-          echo "storeFile=../test.jks" >> android/key.properties
+          cat > android/app/google-services.json << 'EOF'
+          {
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:1234567890:android:abc123def456",
+                  "android_client_info": {
+                    "package_name": "com.example.app"
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
 
-      - name: 安装Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.x'
-          channel: stable
-
-      - name: 安装依赖
+      
+      - name: Install dependencies
         run: flutter pub get
-
-      - name: 打包APK
-        run: flutter build apk --debug
-
-      - name: 上传APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: flutter-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+      
+      - name: Build APK
+        run: flutter build apk --release
