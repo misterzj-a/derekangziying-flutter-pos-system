@@ -15,7 +15,7 @@ on:
       - "pubspec.lock"
       - "mkdocs.yaml"
       - "Makefile"
-      - ".github/**"
+ 
   pull_request:
 
   # Allows you to run this workflow manually from the Actions tab
