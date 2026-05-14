@@ -80,7 +80,7 @@ jobs:
 
       # 🔥 【官方标准打包】绝对不闪退
       - name: 打包APK
-        run: flutter build apk --debug --flavor dev
+        run: flutter build apk --release --flavor dev
 
       # 上传
       - name: 上传APK
