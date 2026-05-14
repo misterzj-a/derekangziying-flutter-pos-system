@@ -9,8 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. 创建签名文件（解决第一个报错）
-      - name: 创建签名配置 key.properties
+      # 🔥 修复关键：自动创建空的 key.properties，解决报错！
+      - name: 创建签名配置文件
         run: |
           mkdir -p android
           echo "storePassword=test" > android/key.properties
@@ -18,40 +18,7 @@ jobs:
           echo "keyAlias=test" >> android/key.properties
           echo "storeFile=../test.jks" >> android/key.properties
 
-       # 2. 🔥 修复 Firebase：生成完整合法的 google-services.json
-      - name: 创建完整谷歌服务文件
-        run: |
-          mkdir -p android/app/src/dev/debug/ android/app/src/debug/dev/ android/app/src/dev/ android/app/src/debug/
-          cat > android/app/google-services.json << 'EOF'
-{
-  "project_info": {
-    "project_number": "1234567890",
-    "firebase_url": "https://fake-firebase.firebaseio.com",
-    "project_id": "fake-firebase-project",
-    "storage_bucket": "fake-firebase.appspot.com"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:1234567890:android:abcdef1234567890",
-        "android_client_info": {
-          "package_name": "com.example.flutterpos"
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
-}
-EOF
-
-          # 复制到所有需要的目录
-          cp android/app/google-services.json android/app/src/dev/debug/google-services.json 2>/dev/null || true
-          cp android/app/google-services.json android/app/src/debug/dev/google-services.json 2>/dev/null || true
-          cp android/app/google-services.json android/app/src/dev/google-services.json 2>/dev/null || true
-          cp android/app/google-services.json android/app/src/debug/google-services.json 2>/dev/null || true
-
-
-      - name: 安装 Flutter
+      - name: 安装Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.x'
@@ -60,12 +27,10 @@ EOF
       - name: 安装依赖
         run: flutter pub get
 
-      # 3. 打包调试APK
-      - name: 打包安卓APK
+      - name: 打包APK
         run: flutter build apk --debug
 
-      # 4. 上传输出
-      - name: 上传APK文件
+      - name: 上传APK
         uses: actions/upload-artifact@v4
         with:
           name: flutter-apk
