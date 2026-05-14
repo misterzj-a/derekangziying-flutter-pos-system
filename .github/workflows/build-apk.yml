@@ -18,15 +18,38 @@ jobs:
           echo "keyAlias=test" >> android/key.properties
           echo "storeFile=../test.jks" >> android/key.properties
 
-      # 2. 创建空的 google-services.json（解决 Firebase 报错）
-      - name: 创建空谷歌服务文件
+       # 2. 🔥 修复 Firebase：生成完整合法的 google-services.json
+      - name: 创建完整谷歌服务文件
         run: |
-          mkdir -p android/app/src/dev/debug/
-          cat > android/app/google-services.json << EOF
-          {"client":[{"client_info":{"mobilesdk_app_id":"1:1234567890:android:1234","android_client_info":{"package_name":"com.example.app"}}}],"configuration_version":"1"}
-          EOF
-          cp android/app/google-services.json android/app/src/dev/debug/google-services.json || true
-          cp android/app/google-services.json android/app/src/debug/dev/google-services.json || true
+          mkdir -p android/app/src/dev/debug/ android/app/src/debug/dev/ android/app/src/dev/ android/app/src/debug/
+          cat > android/app/google-services.json << 'EOF'
+{
+  "project_info": {
+    "project_number": "1234567890",
+    "firebase_url": "https://fake-firebase.firebaseio.com",
+    "project_id": "fake-firebase-project",
+    "storage_bucket": "fake-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1234567890:android:abcdef1234567890",
+        "android_client_info": {
+          "package_name": "com.example.flutterpos"
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+EOF
+
+          # 复制到所有需要的目录
+          cp android/app/google-services.json android/app/src/dev/debug/google-services.json 2>/dev/null || true
+          cp android/app/google-services.json android/app/src/debug/dev/google-services.json 2>/dev/null || true
+          cp android/app/google-services.json android/app/src/dev/google-services.json 2>/dev/null || true
+          cp android/app/google-services.json android/app/src/debug/google-services.json 2>/dev/null || true
+
 
       - name: 安装 Flutter
         uses: subosito/flutter-action@v2
