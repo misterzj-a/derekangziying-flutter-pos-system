@@ -8,20 +8,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # 1. 自动生成签名文件 test.jks
-      - name: 生成 test.jks 签名文件
+      # 🔥 严格按照你提供的命令 生成签名文件
+      - name: 生成 my-jks.jks 签名文件
         run: |
-          keytool -genkey -v -keystore android/test.jks -alias test \
-          -keyalg RSA -keysize 2048 -validity 10000 \
-          -storepass test -keypass test \
-          -dname "CN=Test,OU=Test,O=Test,L=Test,S=Test,C=US"
-      - name: 创建签名配置文件
+          keytool -genkey -v -keystore android/app/my-jks.jks \
+          -alias possystem \
+          -keyalg RSA \
+          -keysize 2048 \
+          -validity 10000 \
+          -storepass possystem \
+          -keypass possystem \
+          -dname "CN=possystem, OU=possystem, O=possystem, L=Unknown, ST=Unknown, C=Unknown"
+
+      # 🔥 对应生成 key.properties（严格匹配）
+      - name: 创建 key.properties
         run: |
-          mkdir -p android
-          echo "storePassword=test" > android/key.properties
-          echo "keyPassword=test" >> android/key.properties
-          echo "keyAlias=test" >> android/key.properties
-          echo "storeFile=../test.jks" >> android/key.properties
+          echo "storePassword=possystem" > android/key.properties
+          echo "keyPassword=possystem" >> android/key.properties
+          echo "keyAlias=possystem" >> android/key.properties
+          echo "storeFile=app/my-jks.jks" >> android/key.properties
 
       - name: 生成google-services.json
         run: |
