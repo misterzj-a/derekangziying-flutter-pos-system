@@ -24,10 +24,10 @@ jobs:
 # 🔥 对应生成 key.properties（严格匹配）
       - name: 创建 key.properties
         run: |
-          echo "storePassword=possystem" > android/key.properties
-          echo "keyPassword=possystem" >> android/key.properties
-          echo "keyAlias=possystem" >> android/key.properties
-          echo "storeFile=my-jks.jks" >> android/key.properties
+          echo "storePassword=android" > android/key.properties
+          echo "keyPassword=android" >> android/key.properties
+          echo "keyAlias=androiddebugkey" >> android/key.properties
+          echo "storeFile=~/.android/debug.keystore" >> android/key.properties
 
 
       # 🔥 生成合法 google-services.json
@@ -66,7 +66,7 @@ jobs:
 
       # 🔥 【官方标准打包】绝对不闪退
       - name: 打包APK
-        run: flutter build apk --debug
+        run: flutter build apk --debug --flavor dev
 
       # 上传
       - name: 上传APK
