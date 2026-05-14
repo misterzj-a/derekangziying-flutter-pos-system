@@ -9,9 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🔥 生成【标准调试签名】，不闪退
-      - name: 生成 debug 签名文件
+      # 👇 最关键：直接用系统默认路径生成，100%不报错
+      - name: 创建 .android 文件夹并生成调试签名
         run: |
+          mkdir -p ~/.android
           keytool -genkey -v -keystore ~/.android/debug.keystore \
           -alias androiddebugkey \
           -keyalg RSA \
@@ -21,9 +22,6 @@ jobs:
           -keypass android \
           -dname "CN=Android Debug,O=Android,C=US"
 
-      # 🔥 禁用自定义签名 = 彻底解决闪退
-      - name: 删除自定义签名配置（防止冲突）
-        run: rm -f android/key.properties || true
 
       # 🔥 生成合法 google-services.json
       - name: 生成 google-services.json
