@@ -1,42 +1,28 @@
-name: Tests
+name: Build APK
 
 on:
-  push:
-    branches:
-      - main
-      - master
-    paths-ignore:
-      - "**.md"
-      - "docs/**"
-      - "scripts/**"
-      - "mkdocs.yaml"
-      - "Makefile"
-
-  pull_request:
-    branches:
-      - main
-      - master
-
   workflow_dispatch:
 
 jobs:
-  code-checking:
-    name: Check code format
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.27.x"
-          cache: true
-          channel: "stable"
+          flutter-version: '3.27.x'
+          channel: stable
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Linter
-        run: flutter analyze .
+      - name: Build APK
+        run: flutter build apk --release
 
-      - name: Format
-        run: dart format --set-exit-if-changed --show none --line-length 120 .
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
