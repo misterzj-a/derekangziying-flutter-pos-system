@@ -21,8 +21,14 @@ jobs:
       # ✅ 新增：自动生成合法的 google-services.json（解决你所有报错）
       - name: 生成合法 google-services.json
         run: |
-          cat > android/app/google-services.json << 'EOF'
+           cat > android/app/google-services.json << 'EOF'
           {
+            "project_info": {
+              "project_number": "1234567890",
+              "firebase_url": "https://fake-project.firebaseio.com",
+              "project_id": "fake-project-id",
+              "storage_bucket": "fake-project.appspot.com"
+            },
             "client": [
               {
                 "client_info": {
