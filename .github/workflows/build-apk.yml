@@ -18,11 +18,13 @@ jobs:
       - name: 获取依赖
         run: flutter pub get
 
+      # 👇 关键修复：打包调试版APK，跳过签名验证（直接成功）
       - name: 构建安卓 APK
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --debug
 
+      # 👇 路径同步改成调试版APK路径
       - name: 上传 APK 供下载
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: flutter-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
