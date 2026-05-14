@@ -67,12 +67,12 @@ jobs:
         run: flutter pub get
 
       - name: 打包APK
-        run: flutter build apk --debug
 
+        run: flutter build apk --debug --flavor dev
+
+      # 🔥 上传所有 APK，绝对能找到
       - name: 上传APK
         uses: actions/upload-artifact@v4
         with:
           name: flutter-apk
-          path: |
-            build/app/outputs/flutter-apk/*.apk
-            build/app/outputs/apk/**/*.apk
+          path: build/app/outputs/flutter-apk/
