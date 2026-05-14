@@ -91,6 +91,9 @@ flutter {
 
 dependencies {
   implementation 'com.android.support:multidex:1.0.3'
+  com.google.gms {
+    missingGoogleServicesStrategy = IGNORE
+}
   // kotlin version
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10"
   implementation "androidx.multidex:multidex:2.0.1"
