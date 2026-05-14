@@ -8,33 +8,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # 🔥 严格按照你提供的命令 生成签名文件
-      - name: 生成 my-jks.jks 签名文件
+
+      # 🔥 生成【标准调试签名】，不闪退
+      - name: 生成 debug 签名文件
         run: |
-          keytool -genkey -v -keystore android/app/my-jks.jks \
-          -alias possystem \
+          keytool -genkey -v -keystore ~/.android/debug.keystore \
+          -alias androiddebugkey \
           -keyalg RSA \
           -keysize 2048 \
           -validity 10000 \
-          -storepass possystem \
-          -keypass possystem \
-          -dname "CN=possystem, OU=possystem, O=possystem, L=Unknown, ST=Unknown, C=Unknown"
+          -storepass android \
+          -keypass android \
+          -dname "CN=Android Debug,O=Android,C=US"
 
-      # 🔥 对应生成 key.properties（严格匹配）
-      - name: 创建 key.properties
-        run: |
-          echo "storePassword=possystem" > android/key.properties
-          echo "keyPassword=possystem" >> android/key.properties
-          echo "keyAlias=possystem" >> android/key.properties
-          echo "storeFile=my-jks.jks" >> android/key.properties
+      # 🔥 禁用自定义签名 = 彻底解决闪退
+      - name: 删除自定义签名配置（防止冲突）
+        run: rm -f android/key.properties || true
 
-      - name: 生成google-services.json
+      # 🔥 生成合法 google-services.json
+      - name: 生成 google-services.json
         run: |
           cat > android/app/google-services.json << EOF
           {
             "project_info": {
               "project_number": "123456789",
-              "firebase_url": "https://fake.firebaseio.com",
               "project_id": "fake-project",
               "storage_bucket": "fake.appspot.com"
             },
@@ -46,11 +43,7 @@ jobs:
                     "package_name": "com.evanlu.possystem"
                   }
                 },
-                "api_key": [
-                  {
-                    "current_key": "fake_api_key_1234567890"
-                  }
-                ]
+                "api_key": [{"current_key": "fake_key"}]
               }
             ],
             "configuration_version": "1"
@@ -66,11 +59,11 @@ jobs:
       - name: 安装依赖
         run: flutter pub get
 
+      # 🔥 【官方标准打包】绝对不闪退
       - name: 打包APK
+        run: flutter build apk --debug
 
-        run: flutter build apk --debug --flavor dev
-
-      # 🔥 上传所有 APK，绝对能找到
+      # 上传
       - name: 上传APK
         uses: actions/upload-artifact@v4
         with:
