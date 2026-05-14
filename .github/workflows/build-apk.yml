@@ -32,29 +32,40 @@ jobs:
 
 
       # 🔥 生成合法 google-services.json
-      - name: 生成 google-services.json
+       - name: 生成完整 google-services.json
         run: |
           cat > android/app/google-services.json << EOF
           {
             "project_info": {
-              "project_number": "123456789",
-              "project_id": "fake-project",
-              "storage_bucket": "fake.appspot.com"
+              "project_number": "000000000000",
+              "firebase_url": "https://fake-project.firebaseio.com",
+              "project_id": "fake-project-id",
+              "storage_bucket": "fake-project-id.appspot.com"
             },
             "client": [
               {
                 "client_info": {
-                  "mobilesdk_app_id": "1:123456789:android:abcdef",
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
                   "android_client_info": {
                     "package_name": "com.evanlu.possystem"
                   }
                 },
-                "api_key": [{"current_key": "fake_key"}]
+                "api_key": [
+                  {
+                    "current_key": "AIzaSyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
               }
             ],
             "configuration_version": "1"
           }
           EOF
+
 
       - name: 安装Flutter
         uses: subosito/flutter-action@v2
