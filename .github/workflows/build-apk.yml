@@ -8,7 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      # 1. 自动生成签名文件 test.jks
+      - name: 生成 test.jks 签名文件
+        run: |
+          keytool -genkey -v -keystore android/test.jks -alias test \
+          -keyalg RSA -keysize 2048 -validity 10000 \
+          -storepass test -keypass test \
+          -dname "CN=Test,OU=Test,O=Test,L=Test,S=Test,C=US"
       - name: 创建签名配置文件
         run: |
           mkdir -p android
