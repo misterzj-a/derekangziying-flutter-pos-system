@@ -9,7 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🔥 修复关键：自动创建空的 key.properties，解决报错！
       - name: 创建签名配置文件
         run: |
           mkdir -p android
@@ -18,10 +17,9 @@ jobs:
           echo "keyAlias=test" >> android/key.properties
           echo "storeFile=../test.jks" >> android/key.properties
 
-      # ✅ 新增：自动生成合法的 google-services.json（解决你所有报错）
-      - name: 生成合法 google-services.json
+      - name: 生成google-services.json
         run: |
-              cat > android/app/google-services.json << EOF
+          cat > android/app/google-services.json << EOF
           {
             "project_info": {
               "project_number": "123456789",
