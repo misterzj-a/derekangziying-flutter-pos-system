@@ -27,7 +27,8 @@ jobs:
           echo "storePassword=android" > android/key.properties
           echo "keyPassword=android" >> android/key.properties
           echo "keyAlias=androiddebugkey" >> android/key.properties
-          echo "storeFile=~/.android/debug.keystore" >> android/key.properties
+          echo "storeFile=/home/runner/.android/debug.keystore" >> android/key.properties
+
 
 
       # 🔥 生成合法 google-services.json
