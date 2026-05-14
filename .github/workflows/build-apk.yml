@@ -33,7 +33,7 @@ jobs:
 
       # 🔥 生成合法 google-services.json
        - name: 生成完整 google-services.json
-        run: |
+         run: |
           cat > android/app/google-services.json << EOF
           {
             "project_info": {
