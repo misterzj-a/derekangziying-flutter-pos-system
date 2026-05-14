@@ -21,7 +21,8 @@ jobs:
           -storepass android \
           -keypass android \
           -dname "CN=Android Debug,O=Android,C=US"
-# 🔥 对应生成 key.properties（严格匹配）
+
+      # 🔥 对应生成 key.properties（严格匹配）
       - name: 创建 key.properties
         run: |
           echo "storePassword=android" > android/key.properties
@@ -29,11 +30,9 @@ jobs:
           echo "keyAlias=androiddebugkey" >> android/key.properties
           echo "storeFile=/home/runner/.android/debug.keystore" >> android/key.properties
 
-
-
       # 🔥 生成合法 google-services.json
-       - name: 生成完整 google-services.json
-         run: |
+      - name: 生成完整 google-services.json
+        run: |
           cat > android/app/google-services.json << EOF
           {
             "project_info": {
@@ -65,7 +64,6 @@ jobs:
             "configuration_version": "1"
           }
           EOF
-
 
       - name: 安装Flutter
         uses: subosito/flutter-action@v2
