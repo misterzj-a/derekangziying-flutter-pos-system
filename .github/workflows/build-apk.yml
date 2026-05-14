@@ -34,7 +34,12 @@ jobs:
                   "android_client_info": {
                     "package_name": "com.evanlu.possystem"
                   }
-                }
+                },
+                "api_key": [
+                  {
+                    "current_key": "fake_api_key_1234567890"
+                  }
+                ]
               }
             ],
             "configuration_version": "1"
