@@ -1,8 +1,6 @@
 name: Tests
 
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches:
       - master
@@ -10,59 +8,69 @@ on:
       - "**.md"
       - "docs/**"
       - "scripts/**"
-      - "android/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
       - "mkdocs.yaml"
       - "Makefile"
-      - ".github/**"
   pull_request:
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   code-checking:
     name: Check code format and testing
     runs-on: ubuntu-latest
-    if: ${{ !startsWith(github.head_ref , 'refs/heads/ci/') }}
+    if: ${{ !startsWith(github.head_ref, 'ci/') }}
     steps:
       - uses: actions/checkout@v4
 
-      # Setup the flutter environment.
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.27.x"
+          flutter-version: "3.22.3"
           cache: true
           channel: "stable"
 
-      # Get flutter dependencies.
       - name: Install dependencies
         env:
           GH_READ_PAT: ${{ secrets.GH_READ_PAT }}
         run: |
-          echo "https://oauth:$GH_READ_PAT@github.com" > ~/.git-credentials
-          git config --global credential.helper store
+          git config --global url."https://x-access-token:${GH_READ_PAT}@github.com/".insteadOf "https://github.com/"
+          git config --global --add safe.directory /github/workspace
           flutter pub get
+          flutter gen-l10n
 
-      # Statically analyze the Dart code for any errors.
       - name: Linter
         run: flutter analyze .
 
       - name: Format
-        run: dart format --set-exit-if-changed --show none --line-length 120 .
+        run: |
+          dart format --line-length 120 lib/l10n/gen || true
+          dart format --set-exit-if-changed --show none --line-length 120 .
 
-      # Run widget tests for our flutter project.
       - name: Testing
         if: github.event_name == 'pull_request'
         run: flutter test
 
       - name: Testing with Coverage
         if: github.event_name != 'pull_request'
-        run: flutter test --coverage
+        run: |
+          sudo apt-get install -y lcov
+          flutter test --coverage
+          lcov --remove coverage/lcov.info "lib/l10n/gen/*" -o coverage/lcov.info
 
       - name: Coverage to codecov
         if: github.event_name != 'pull_request'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           file: coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      # ======================
+      # 👇 这里就是打包 APK
+      # ======================
+      - name: Build APK
+        run: |
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
