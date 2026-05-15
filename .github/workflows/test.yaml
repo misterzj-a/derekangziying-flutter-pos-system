@@ -1,28 +1,68 @@
-name: Build APK
+name: Tests
 
+# Controls when the action will run.
 on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "scripts/**"
+      - "android/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "mkdocs.yaml"
+      - "Makefile"
+      - ".github/**"
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  build:
+  code-checking:
+    name: Check code format and testing
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.head_ref , 'refs/heads/ci/') }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      # Setup the flutter environment.
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.x'
-          channel: stable
+          flutter-version: "3.27.x"
+          cache: true
+          channel: "stable"
 
+      # Get flutter dependencies.
       - name: Install dependencies
-        run: flutter pub get
+        env:
+          GH_READ_PAT: ${{ secrets.GH_READ_PAT }}
+        run: |
+          echo "https://oauth:$GH_READ_PAT@github.com" > ~/.git-credentials
+          git config --global credential.helper store
+          flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
+      # Statically analyze the Dart code for any errors.
+      - name: Linter
+        run: flutter analyze .
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Format
+        run: dart format --set-exit-if-changed --show none --line-length 120 .
+
+      # Run widget tests for our flutter project.
+      - name: Testing
+        if: github.event_name == 'pull_request'
+        run: flutter test
+
+      - name: Testing with Coverage
+        if: github.event_name != 'pull_request'
+        run: flutter test --coverage
+
+      - name: Coverage to codecov
+        if: github.event_name != 'pull_request'
+        uses: codecov/codecov-action@v3
         with:
-          name: flutter-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          file: coverage/lcov.info
