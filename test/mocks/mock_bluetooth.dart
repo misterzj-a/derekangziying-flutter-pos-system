@@ -6,8 +6,9 @@ import 'package:mockito/mockito.dart';
 import 'package:packages/bluetooth.dart' as bt;
 import 'package:possystem/components/imageable_container.dart';
 import 'package:possystem/services/bluetooth.dart';
-
-import 'mock_bluetooth.mocks.dart';
+import 'package:packages/fbp.dart'; // 修复 FBP not found
+import 'package:flutter_blue_plus/flutter_blue_plus.dart'; // 修复蓝牙类型不匹配
+//import 'mock_bluetooth.mocks.dart';
 
 final blue = MockBluetooth();
 
@@ -18,6 +19,8 @@ final blue = MockBluetooth();
   bt.PrinterManufactory,
   ImageableManger,
   ImageableController,
+  FBP, // 👈 必须加上！修复 FBP 找不到
+  BluetoothCharacteristic, // 👈 必须加上！修复类型不匹配
 ])
 void initializeBlue() {
   Bluetooth.instance = Bluetooth(blue: blue);
